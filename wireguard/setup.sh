@@ -11,7 +11,7 @@ Address = 172.16.0.0/16
 ListenPort = 39349
 
 [Peer]
-PublicKey = -
+PublicKey = 
 AllowedIPs = 
 Endpoint = :39349" | sudo tee /etc/wireguard/wg0.conf
 
