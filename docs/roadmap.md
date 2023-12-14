@@ -1,8 +1,8 @@
 Phase 1: Planning and Design
 
     Requirement Analysis:
-        Define clear objectives and requirements for the OpenGPU project.
-        Identify the target users (researchers, AI enthusiasts, volunteers with GPU resources).
+    *    Define clear objectives and requirements for the OpenGPU project.
+    *   Identify the target users (researchers, AI enthusiasts, volunteers with GPU resources).
 
     Architecture Design:
         Design the high-level architecture of the system, including the distributed computing infrastructure, data management, CI/CD pipelines, and user interfaces.
