@@ -1,8 +1,8 @@
 FROM pytorch/pytorch:latest
 
-RUN pip install -U "ray[train]"
+RUN pip install torchx[dev]
 
-COPY /application/distributed.py /workspace/distributed.py
+COPY /application/train.py /workspace/train.py
 
 CMD ["python", "/workspace/distributed.py"]
 
