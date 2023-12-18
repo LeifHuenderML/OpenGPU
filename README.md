@@ -1,4 +1,4 @@
-![OpenGPU Logo](/OpenGPU/docs/images/OpenGPU_logo.png)
+![OpenGPU Logo](/docs/images/OpenGPU_logo.png)
 
 # OpenGPU
 
