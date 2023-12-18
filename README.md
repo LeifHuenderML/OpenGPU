@@ -1,4 +1,5 @@
-![OpenGPU Logo](/docs/images/OpenGPU_logo.png)
+<img src="/docs/images/OpenGPU_logo.png" alt="OpenGPU Logo" width="200"/>
+
 
 # OpenGPU
 
