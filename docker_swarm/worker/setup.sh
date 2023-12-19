@@ -20,18 +20,23 @@ else
     exit 1
 fi
 
-echo "Setting up NVIDIA drivers..."
-sudo add-apt-repository ppa:graphics-drivers/ppa
-sudo apt-get update
-ubuntu-drivers devices
-sudo ubuntu-drivers autoinstall
+echo "Checking for NVIDIA GPU..."
+if lspci | grep -qi nvidia; then
+    echo "NVIDIA GPU detected. Proceeding with driver setup..."
+    sudo add-apt-repository ppa:graphics-drivers/ppa
+    sudo apt-get update
+    ubuntu-drivers devices
+    sudo ubuntu-drivers autoinstall
 
-echo "System needs to be rebooted to complete the installation."
-read -p "Do you want to reboot now? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    sudo reboot
+    echo "System needs to be rebooted to complete the installation."
+    read -p "Do you want to reboot now? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        sudo reboot
+    else
+        echo "Please reboot the system manually to apply changes."
+    fi
 else
-    echo "Please reboot the system manually to apply changes."
+    echo "No NVIDIA GPU detected. Skipping driver installation."
 fi

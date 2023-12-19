@@ -1,10 +1,22 @@
 #!/bin/bash
 
+# Function to check for the presence of an NVIDIA GPU
+check_for_nvidia_gpu() {
+    # Check if any NVIDIA GPU is listed in the PCI devices
+    if lspci | grep -qi nvidia; then
+        echo "NVIDIA GPU detected in the system."
+        return 0
+    else
+        echo "No NVIDIA GPU detected in the system. NVIDIA driver check is not applicable."
+        return 1
+    fi
+}
+
 # Function to check NVIDIA drivers
 check_nvidia_drivers() {
     # Check if nvidia-smi command is available
     if ! command -v nvidia-smi &> /dev/null; then
-        echo "nvidia-smi command not found. NVIDIA drivers may not be installed correctly."
+        echo "nvidia-smi command not found. This could be due to missing NVIDIA drivers or no NVIDIA GPU in the system."
         return 1
     fi
 
@@ -22,5 +34,8 @@ check_nvidia_drivers() {
     fi
 }
 
-# Call the function to check NVIDIA drivers
-check_nvidia_drivers
+# First, check if an NVIDIA GPU is present
+if check_for_nvidia_gpu; then
+    # If an NVIDIA GPU is present, check the drivers
+    check_nvidia_drivers
+fi
