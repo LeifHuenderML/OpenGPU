@@ -25,6 +25,9 @@ init_swarm() {
     echo "Initializing Docker Swarm with IP: $ip_addr"
     sudo docker swarm init --advertise-addr "$ip_addr"
     check_status "Failed to initialize Docker Swarm."
+
+    sudo docker network create --driver overlay --attachable openGPU_swarm_network
+    check_status "Failed to initiaize network overlay"
 }
 
 # Main function

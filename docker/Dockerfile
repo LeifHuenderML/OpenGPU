@@ -1,8 +1,8 @@
 FROM pytorch/pytorch:latest
 
-RUN pip install torchx[dev]
+RUN pip install torchelastic torchvision lightning deepspeed
 
 COPY /application/train.py /workspace/train.py
-
-CMD ["python", "/workspace/distributed.py"]
+#COPY /application/entry_script.py /workspace/entry_script.py
+CMD ["python", "/workspace/train.py"]
 
