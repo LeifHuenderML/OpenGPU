@@ -22,7 +22,6 @@ class Net(pl.LightningModule):
         output = self(data)
         loss = nn.functional.cross_entropy(output, target)
         return loss
-#change to be the AdamDeepCPU optimizer
     def configure_optimizers(self):
         optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(7840)
         return optimizer
