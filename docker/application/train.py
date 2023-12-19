@@ -5,6 +5,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 import pytorch_lightning as pl
 from pytorch_lightning.plugins import DeepSpeedPlugin
+import deepspeed
 
 # Define a simple neural network as a Lightning Module
 class Net(pl.LightningModule):
@@ -21,9 +22,9 @@ class Net(pl.LightningModule):
         output = self(data)
         loss = nn.functional.cross_entropy(output, target)
         return loss
-
+#change to be the AdamDeepCPU optimizer
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.parameters(), lr=0.001)
+        optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(7840)
         return optimizer
 
     def train_dataloader(self):
