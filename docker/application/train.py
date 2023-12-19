@@ -1,53 +1,47 @@
 import os
 import torch
-import torch.distributed as dist
 import torch.nn as nn
 import torch.optim as optim
-import torch.multiprocessing as mp
-import torch.nn.functional as F
-import torchvision.transforms as transforms
-import torchvision.datasets as datasets
-from torch.nn.parallel import DistributedDataParallel as DDP
+from torchvision import datasets, transforms
 
-
-
-class SimpleNet(nn.Module):
+# Define a simple neural network
+class Net(nn.Module):
     def __init__(self):
-        super(SimpleNet, self).__init__()
+        super(Net, self).__init__()
         self.fc = nn.Linear(784, 10)
 
     def forward(self, x):
         x = x.view(-1, 784)
-        x = self.fc(x)
-        return F.log_softmax(x, dim=1)
-
-def train(model, device, train_loader, optimizer, epoch):
-    model.train()
-    for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), target.to(device)
-        optimizer.zero_grad()
-        output = model(data)
-        loss = F.nll_loss(output, target)
-        loss.backward()
-        optimizer.step()
-        if batch_idx % 10 == 0:
-            print(f'Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)} ({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}')
+        return self.fc(x)
 
 def main():
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SimpleNet().to(device)
+    # Set up the neural network and move it to GPU if available
+    model = Net()
+    if torch.cuda.is_available():
+        model.cuda()
+
+    # Set up the data loader for the MNIST dataset
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+    dataset = datasets.MNIST('.', train=True, download=True, transform=transform)
+    loader = torch.utils.data.DataLoader(dataset, batch_size=64, shuffle=True)
+
+    # Set up the optimizer
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
-    # Data loading code
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-    ])
-    train_dataset = datasets.MNIST('../data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
+    # Training loop
+    for epoch in range(1, 5):
+        model.train()
+        for batch_idx, (data, target) in enumerate(loader):
+            if torch.cuda.is_available():
+                data, target = data.cuda(), target.cuda()
+            optimizer.zero_grad()
+            output = model(data)
+            loss = nn.functional.cross_entropy(output, target)
+            loss.backward()
+            optimizer.step()
 
-    for epoch in range(1, 10):
-        train(model, device, train_loader, optimizer, epoch)
+            if batch_idx % 10 == 0:
+                print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(loader.dataset)} ({100. * batch_idx / len(loader):.0f}%)]\tLoss: {loss.item():.6f}")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
