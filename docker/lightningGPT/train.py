@@ -24,6 +24,7 @@ trainer = L.Trainer(
     devices=n_devices,
     num_nodes=4,  # change this to be dynamic
     accelerator=device_accelerator,
+    plugins="ddp_sharded"
     strategy="deepspeed_stage_1",
     precision=16
 )
