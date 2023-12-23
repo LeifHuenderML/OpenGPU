@@ -13,12 +13,12 @@ import math
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-
-from ligthninggpt.utils import CfgNode as CN
+import lightning as L
+from ligthning_gpt.utils import CfgNode as CN
 
 # -----------------------------------------------------------------------------
 
-class NewGELU(nn.Module):
+class NewGELU(L.LightningModule):
     """
     Implementation of the GELU activation function currently in Google BERT repo (identical to OpenAI GPT).
     Reference: Gaussian Error Linear Units (GELU) paper: https://arxiv.org/abs/1606.08415
@@ -26,7 +26,7 @@ class NewGELU(nn.Module):
     def forward(self, x):
         return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
 
-class CausalSelfAttention(nn.Module):
+class CausalSelfAttention(L.LightningModule):
     """
     A vanilla multi-head masked self-attention layer with a projection at the end.
     It is possible to use torch.nn.MultiheadAttention here but I am including an
@@ -70,7 +70,7 @@ class CausalSelfAttention(nn.Module):
         y = self.resid_dropout(self.c_proj(y))
         return y
 
-class Block(nn.Module):
+class Block(L.LightningModule):
     """ an unassuming Transformer block """
 
     def __init__(self, config):
@@ -92,7 +92,7 @@ class Block(nn.Module):
         x = x + self.mlpf(self.ln_2(x))
         return x
 
-class GPT(nn.Module):
+class GPT(L.LightningModule):
     """ GPT Language Model """
 
     @staticmethod
@@ -141,7 +141,7 @@ class GPT(nn.Module):
                 'gpt-nano':     dict(n_layer=3, n_head=3, n_embd=48),
             }[config.model_type])
 
-        self.transformer = nn.ModuleDict(dict(
+        self.transformer = L.LightningModuleDict(dict(
             wte = nn.Embedding(config.vocab_size, config.n_embd),
             wpe = nn.Embedding(config.block_size, config.n_embd),
             drop = nn.Dropout(config.embd_pdrop),

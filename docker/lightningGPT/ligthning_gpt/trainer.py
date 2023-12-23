@@ -8,7 +8,7 @@ from collections import defaultdict
 
 import torch
 from torch.utils.data.dataloader import DataLoader
-from ligthninggpt.utils import CfgNode as CN
+from ligthning_gpt.utils import CfgNode as CN
 
 class Trainer:
 
