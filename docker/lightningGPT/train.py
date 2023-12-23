@@ -8,21 +8,24 @@ model_config.vocab_size = 50257
 model_config.clock_size = 1024
 ltng_gpt = GPT(model_config)
 
-dataset = #add a dataset
-train_loader = #add a train loader
+dataset = # add a dataset
+train_loader = # add a train loader
 
 if torch.cuda.is_available():
-    device_accelerator = "gpu"
+    device_accelerator="gpu",
+    n_devices = torch.cuda.device_count();
 else:
-    device_accelerator = "cpu"
+    device_accelerator="cpu"
+    n_devices = 1
 
 trainer = L.Trainer(
     limit_train_batches=100,
     max_epochs=10,
-    devices=4 #change to be dynamic
-    accelerator=device_accelerator
-    strategy="deepspeed_stage_1" #update so it fits the stage where it is DP+PP+TP+ZeRO-1 currently it is at just DP+ZeRO-1 
-    precision=16 #prolly change this too
-
+    devices=n_devices,
+    num_nodes=4,  # change this to be dynamic
+    accelerator=device_accelerator,
+    strategy="deepspeed_stage_1",
+    precision=16
 )
-trainer.fit(model=ltng_gpt, train_dataloader = train_loader)
+
+trainer.fit(model=ltng_gpt, train_dataloaders=train_loader)
