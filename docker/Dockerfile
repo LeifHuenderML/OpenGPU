@@ -11,8 +11,8 @@ COPY minGPT /workspace/minGPT
 RUN pip install -e /workspace/minGPT
 
 # Copy the application scripts
-COPY application/train.py /workspace/train.py
+COPY application/simple_model/train.py /workspace/simple_model/train.py
 #COPY application/entry_script.py /workspace/entry_script.py
 
 # Set the command to run the training script
-CMD ["python", "/workspace/train.py"]
+CMD ["python", "/workspace/simple_model/train.py"]
