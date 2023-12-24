@@ -1,30 +1,25 @@
 import os
-from torch import optim, nn, utils, Tensor
+from torch import optim, nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
-import lightning as L
+import pytorch_lightning as pl
+from torch.utils.data import DataLoader
+from pytorch_lightning.strategies import DDPStrategy
 
-# define any number of nn.Modules (or use your current ones)
-encoder = nn.Sequential(nn.Linear(28 * 28, 64), nn.ReLU(), nn.Linear(64, 3))
-decoder = nn.Sequential(nn.Linear(3, 64), nn.ReLU(), nn.Linear(64, 28 * 28))
+# Assuming encoder and decoder are defined as before
 
-
-# define the LightningModule
-class LitAutoEncoder(L.LightningModule):
+class LitAutoEncoder(pl.LightningModule):
     def __init__(self, encoder, decoder):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
     def training_step(self, batch, batch_idx):
-        # training_step defines the train loop.
-        # it is independent of forward
-        x, y = batch
+        x, _ = batch
         x = x.view(x.size(0), -1)
         z = self.encoder(x)
         x_hat = self.decoder(z)
         loss = nn.functional.mse_loss(x_hat, x)
-        # Logging to TensorBoard (if installed) by default
         self.log("train_loss", loss)
         return loss
 
@@ -32,14 +27,24 @@ class LitAutoEncoder(L.LightningModule):
         optimizer = optim.Adam(self.parameters(), lr=1e-3)
         return optimizer
 
+    def train_dataloader(self):
+        # Data loader with distributed sampler for DDP
+        dataset = MNIST(os.getcwd(), download=True, transform=ToTensor())
+        train_sampler = None
+        if self.use_ddp:
+            train_sampler = torch.utils.data.distributed.DistributedSampler(dataset)
+        return DataLoader(dataset, batch_size=64, sampler=train_sampler)
 
 # init the autoencoder
 autoencoder = LitAutoEncoder(encoder, decoder)
 
-# setup data
-dataset = MNIST(os.getcwd(), download=True, transform=ToTensor())
-train_loader = utils.data.DataLoader(dataset)
+# Set up the trainer for DDP
+trainer = pl.Trainer(
+    strategy=DDPStrategy(),  # Use DistributedDataParallel strategy
+    gpus=8,  # Number of GPUs (adjust as needed)
+    limit_train_batches=100,
+    max_epochs=1
+)
 
-# train the model (hint: here are some helpful Trainer arguments for rapid idea iteration)
-trainer = L.Trainer(limit_train_batches=100, max_epochs=1)
-trainer.fit(model=autoencoder, train_dataloaders=train_loader)
+# Train the model
+trainer.fit(model=autoencoder)
