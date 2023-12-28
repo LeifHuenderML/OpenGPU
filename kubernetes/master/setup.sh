@@ -11,9 +11,3 @@ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/
 kubectl get pods -n kube-system
 kubectl get nodes
 
-#setup GlusterFS to manage the distributed file system accross the cluster
-kubectl apply -f glusterfs/endpoints.yaml
-kubectl apply -f glusterfs/service.yaml
-kubectl apply -f glusterfs/pv.yaml
-kubectl apply -f glusterfs/pvc.yaml
-kubectl apply -f glusterfs/pod.yaml
