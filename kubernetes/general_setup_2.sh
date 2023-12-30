@@ -39,3 +39,11 @@ sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 sudo apt update
 sudo apt install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
+
+echo "Is this machine a master node, or a worker node (enter a m/w)" 
+read response
+if [[ $response == "m" ]]; then
+    ./master/setup.sh
+else
+    ./worker/setup.sh
+fi
