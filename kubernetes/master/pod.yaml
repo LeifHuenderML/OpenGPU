@@ -16,9 +16,9 @@ spec:
 
     env:
       - name: MASTER_ADDR
-        value: "master-node-ip"
+        value: "192.168.50.132"
       - name: MASTER_PORT
-        value: "12345"
+        value: "53394"
     volumeMounts:
     - name: nfs-storage
       mountPath: /data
