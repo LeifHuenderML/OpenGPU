@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: training-statefulset
+spec:
+  serviceName: "training"
+  replicas: 4 
+  selector:
+    matchLabels:
+      app: training
+  template:
+    metadata:
+      labels:
+        app: training
+    spec:
+      containers:
+      - name: training-container
+        image: leifhuender/distributed_gpu_test:latest
+        resources:
+          requests:
+            memory: "14Gi"
+            cpu: "10"
+          limits:
+            memory: "14Gi"
+            cpu: "10"
+        env:
+          - name: MASTER_ADDR
+            value: "192.168.50.132"
+          - name: MASTER_PORT
+            value: "53394"
+          - name: WORLD_SIZE
+            value: "4"
+        volumeMounts:
+        - name: nfs-storage
+          mountPath: /data
+      volumes:
+      - name: nfs-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc
